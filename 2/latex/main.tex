@@ -1,0 +1,167 @@
+%%%%%%%%%%%%%%%%%%
+% Document class %
+%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper, 12pt]{article}
+
+
+%%%%%%%%%%%%
+% Packages %
+%%%%%%%%%%%%
+
+\usepackage[english]{babel}
+\usepackage[noheader]{packages/sleek}
+\usepackage{packages/sleek-title}
+
+\usepackage{tabularx}
+\usepackage{colortbl}
+
+
+%%%%%%%%%%%%%%%%%%%%
+% Title page setup %
+%%%%%%%%%%%%%%%%%%%%
+
+\logo{resources/pdf/logo-uliege.pdf}
+\institute{University of Liège}
+\faculty{Faculty of Applied Science}
+\title{Securing network with firewalls and\\NATs}
+\subtitle{Step 2: high-level rules}
+\author{Maxime \textsc{Meurisse}\\Valentin \textsc{Vermeylen}}
+\context{Master in Civil Engineering}
+\date{Academic year 2020-2021}
+
+
+%%%%%%%%%%
+% Others %
+%%%%%%%%%%
+
+\definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
+
+
+%%%%%%%%%%%%
+% Document %
+%%%%%%%%%%%%
+
+\begin{document}
+	\maketitle
+	
+	\section{High-level rules}
+	
+	The rules for each firewall are defined in Tables \ref{tab:rules.fw1}, \ref{tab:rules.fw2}, \ref{tab:rules.fw3} and \ref{tab:rules.fw4}. For each zone, from more secured to less secured, we define first the rules for incoming traffic and then the rules for outgoing traffic. We end with a rule that deny all and log.
+	
+	\subsection{Firewall 1}
+	
+	\begin{table}[H]
+	    \centering
+	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	        \hline
+	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
+	        \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_servers\_1}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_servers\_1}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_public}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_public}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Other}\\ \hline
+	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	    \end{tabularx}
+	    \caption{Rules for firewall \emph{FW1}.}
+	    \label{tab:rules.fw1}
+	\end{table}
+	
+	\subsection{Firewall 2}
+	
+	\begin{table}[H]
+	    \centering
+	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	        \hline
+	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
+	        \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_subnet\_2}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_subnet\_2}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_lweb}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_lweb}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Other}\\ \hline
+	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	    \end{tabularx}
+	    \caption{Rules for firewall \emph{FW2}.}
+	    \label{tab:rules.fw2}
+	\end{table}
+	
+	\subsection{Firewall 3}
+	
+	\begin{table}[H]
+	    \centering
+	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	        \hline
+	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
+	        \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_nfs}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_nfs}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_u3}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_u3}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Other}\\ \hline
+	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	    \end{tabularx}
+	    \caption{Rules for firewall \emph{FW3}.}
+	    \label{tab:rules.fw3}
+	\end{table}
+	
+	\subsection{Firewall 4}
+	
+	\begin{table}[H]
+	    \centering
+	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	        \hline
+	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
+	        \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_subnet\_1}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_subnet\_1}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_servers\_2}}\\ \hline
+	        1 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_servers\_2}}\\ \hline
+	        2 & * & * & * & * & * & * & *\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Other}\\ \hline
+	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	    \end{tabularx}
+	    \caption{Rules for firewall \emph{FW4}.}
+	    \label{tab:rules.fw4}
+	\end{table}
+	
+	\section{Explanations}
+	
+	to do
+\end{document}
