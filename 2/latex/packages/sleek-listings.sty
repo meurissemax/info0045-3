@@ -1,27 +1,37 @@
-\ProvidesPackage{sleek-listings}[2019/01/27 v.01 Sleek Listings]
+\ProvidesPackage{sleek-listings}[2020/10/28 v1.0 Sleek Listings]
 
-%%%%%%%%%% Require
+%%%%%%%%%%%%%%%%
+% Requirements %
+%%%%%%%%%%%%%%%%
 
 \RequirePackage{inconsolata}
 \RequirePackage{listings}
+\RequirePackage{xcolor}
 
-%%%%%%%%%% Setup
+%%%%%%%%%%%%
+% Settings %
+%%%%%%%%%%%%
 
-%%%%% Commands
+% Colors
+
+\def\ForestGreen{\color[HTML]{228B22}}
+\def\TrueBlue{\color[HTML]{0000FF}}
+\def\VeronicaPurple{\color[HTML]{A020F0}}
+
+\def\FreeSpeechRed{\color[HTML]{DD0000}}
+\def\SafetyOrange{\color[HTML]{FF7700}}
+\def\DarkMagenta{\color[HTML]{900090}}
+\def\IslamicGreen{\color[HTML]{00AA00}}
+
+%%%%%%%%%%%%
+% Commands %
+%%%%%%%%%%%%
 
 \newcommand{\NumberStyle}[1]{
     \lstdefinestyle{#1Number}{
         style=#1,
         %%%%%
         numbers=left
-    }
-}
-
-\newcommand{\FrameTBStyle}[1]{
-    \lstdefinestyle{#1FrameTB}{
-        style=#1,
-        %%%%%
-        frame=tb
     }
 }
 
@@ -37,18 +47,29 @@
         framexleftmargin=0.75em,
         framexrightmargin=0.75em,
         framextopmargin=0.5em,
-        framexbottommargin=0.5em,
-        %%%%%
-        numbersep=1.25em
+        framexbottommargin=0.5em
     }
 }
 
-\newcommand{\NumberFrameTBStyle}[1]{
+\newcommand{\FrameTBStyle}[1]{
+    \FrameStyle{#1}
+    \lstdefinestyle{#1FrameTB}{
+        style=#1Frame,
+        %%%%%
+        frame=tb,
+        xleftmargin=0em,
+        xrightmargin=0em,
+        framexleftmargin=0em,
+        framexrightmargin=0em
+    }
+}
+
+\newcommand{\FrameTBNumberStyle}[1]{
     \FrameTBStyle{#1}
     \NumberStyle{#1FrameTB}
 }
 
-\newcommand{\NumberFrameStyle}[1]{
+\newcommand{\FrameNumberStyle}[1]{
     \FrameStyle{#1}
     \lstdefinestyle{#1FrameNumber}{
         style=#1Frame,
@@ -61,7 +82,9 @@
     }
 }
 
-%%%%% Styles
+%%%%%%%%%%
+% Styles %
+%%%%%%%%%%
 
 \lstdefinestyle{default}{
     breaklines=true,
@@ -71,17 +94,21 @@
     upquote=true,
     tabsize=4,
     %%%%%
-    framerule=0.66pt,
+    framerule=0.1em,
     captionpos=b,
+    aboveskip=\baselineskip,
+    belowskip=\smallskipamount,
     %%%%%
     basicstyle=\footnotesize\ttfamily,
     numberstyle=\footnotesize\ttfamily,
     showstringspaces=false
 }
 
+\lstset{style=default}
+
 \NumberStyle{default}
-\NumberFrameStyle{default}
-\NumberFrameTBStyle{default}
+\FrameNumberStyle{default}
+\FrameTBNumberStyle{default}
 
 \lstdefinestyle{monokai}{
     style=Framedefault,
@@ -89,13 +116,13 @@
     backgroundcolor=\color[HTML]{272822},
     framerule=0em,
     %%%%%
-    basicstyle=\footnotesize\ttfamily\color[HTML]{f8f8f2},
+    basicstyle=\footnotesize\ttfamily\color[HTML]{F8F8F2},
     numberstyle=\footnotesize\ttfamily\color[HTML]{272822},
-    commentstyle=\color[HTML]{75715e},
-    keywordstyle=[1]{\color[HTML]{f92672}},
+    commentstyle=\color[HTML]{75715E},
+    keywordstyle=[1]{\color[HTML]{F92672}},
     keywordstyle=[2]{\color[HTML]{A6E22E}},
-    keywordstyle=[3]{\color[HTML]{ae81ff}},
-    stringstyle=\color[HTML]{e6db74},
+    keywordstyle=[3]{\color[HTML]{AE81FF}},
+    stringstyle=\color[HTML]{E6DB74},
     %%%%%
     % otherkeywords={!,.,+,-,*,/,=,<,>,^,|,\&,OR,AND}
 }
@@ -115,10 +142,10 @@
     language=C,
     style=default,
     %%%%%
-    commentstyle=\color[HTML]{228B22},
-    keywordstyle=\color[HTML]{0000FF},
-    stringstyle=\color[HTML]{A020F0},
-    emphstyle=\color[HTML]{0000FF},
+    commentstyle=\ForestGreen,
+    keywordstyle=\TrueBlue,
+    stringstyle=\VeronicaPurple,
+    emphstyle=\TrueBlue,
     %%%%%
     emph={}
 }
@@ -127,10 +154,10 @@
     language=C++,
     style=default,
     %%%%%
-    commentstyle=\color[HTML]{228B22},
-    keywordstyle=\color[HTML]{0000FF},
-    stringstyle=\color[HTML]{A020F0},
-    emphstyle=\color[HTML]{0000FF},
+    commentstyle=\ForestGreen,
+    keywordstyle=\TrueBlue,
+    stringstyle=\VeronicaPurple,
+    emphstyle=\TrueBlue,
     %%%%%
     emph={std}
 }
@@ -141,10 +168,10 @@
     %%%%%
     basicstyle=\footnotesize\fontfamily{pcr}\selectfont,
     numberstyle=\footnotesize\fontfamily{pcr}\selectfont,
-    commentstyle=\color[HTML]{228B22},
-    keywordstyle=\color[HTML]{0000FF},
-    stringstyle=\color[HTML]{A020F0},
-    emphstyle=\color[HTML]{0000FF},
+    commentstyle=\ForestGreen,
+    keywordstyle=\TrueBlue,
+    stringstyle=\VeronicaPurple,
+    emphstyle=\TrueBlue,
     %%%%%
     emph={clearvars}
 }
@@ -153,23 +180,23 @@
     language=python,
     style=default,
     %%%%%
-    commentstyle=\color[RGB]{221,0,0},
-    keywordstyle=[1]{\color[RGB]{255,119,0}},
-    keywordstyle=[2]{\color[RGB]{144,0,144}},
-    stringstyle=\color[RGB]{0,170,0},
-    emphstyle=\color[RGB]{255,119,0},
+    commentstyle=\FreeSpeechRed,
+    keywordstyle=[1]{\SafetyOrange},
+    keywordstyle=[2]{\DarkMagenta},
+    stringstyle=\IslamicGreen,
+    emphstyle=\SafetyOrange,
     %%%%%
-    emph={}
+    emph={as}
 }
 
 \lstdefinestyle{java}{
     language=java,
     style=default,
     %%%%%
-    commentstyle=\color[HTML]{228B22},
-    keywordstyle=\color[HTML]{0000FF},
-    stringstyle=\color[HTML]{A020F0},
-    emphstyle=\color[HTML]{0000FF},
+    commentstyle=\ForestGreen,
+    keywordstyle=\TrueBlue,
+    stringstyle=\VeronicaPurple,
+    emphstyle=\TrueBlue,
     %%%%%
     emph={}
 }

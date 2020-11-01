@@ -13,7 +13,7 @@
 \usepackage[noheader]{packages/sleek}
 \usepackage{packages/sleek-title}
 
-\usepackage{tabularx}
+\usepackage{longtable}
 \usepackage{colortbl}
 
 
@@ -37,6 +37,12 @@
 
 \definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
 
+\newcounter{idcounter}
+\newcommand\id{\addtocounter{idcounter}{1}\theidcounter}
+
+\newcounter{portcounter}
+\newcommand\port{\addtocounter{portcounter}{1}\theportcounter}
+
 
 %%%%%%%%%%%%
 % Document %
@@ -47,121 +53,239 @@
 	
 	\section{High-level rules}
 	
-	The rules for each firewall are defined in Tables \ref{tab:rules.fw1}, \ref{tab:rules.fw2}, \ref{tab:rules.fw3} and \ref{tab:rules.fw4}. For each zone, from more secured to less secured, we define first the rules for incoming traffic and then the rules for outgoing traffic. We end with a rule that deny all and log.
+	The rules for each firewall are defined in Tables \ref{tab:rules.fw1}, \ref{tab:rules.fw2}, \ref{tab:rules.fw3} and \ref{tab:rules.fw4}. For each zone, from more secured to less secured, we define first the rules for incoming traffic and then the rules for outgoing traffic. We end with a rule that deny all and log. Each rule is described by a small comment.
+	
+	Firewall 1 acts as a NAT. The rules of this NAT are listed in the Table \ref{tab:rules.nat}.
 	
 	\subsection{Firewall 1}
 	
-	\begin{table}[H]
-	    \centering
-	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	\setcounter{idcounter}{0}
+	
+	\begin{footnotesize}
+	    \begin{longtable}{|l|c|c|c|c|c|c|p{3cm}|}
 	        \hline
 	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
-	        \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_servers\_1}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-ssh-top}}\\ \hline
+	        \id & * & * & 172.16.31.3 & 22 & TCP & allow & SSH from Internet\\ \hline
+	        \id & * & * & 172.16.31.0/24 & * & * & deny & deny everything else to \emph{z-ssh-top}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_servers\_1}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-ssh-top}}\\ \hline
+	        \id & 172.16.31.3 & * & * & 22 & TCP & allow & SSH to Internet\\ \hline
+	        \id & 172.16.31.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-ssh-top}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_public}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-u1}}\\ \hline
+	        \id & * & * & 192.168.1.0/24 & * & * & deny & deny everything else to \emph{z-u1}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_public}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-u1}}\\ \hline
+	        \id & 192.168.1.2 & * & 172.16.32.3 & 67 & TCP & allow & DHCP relay to server\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.15.30.2 & 80 & TCP & allow & U1 to PWEB (HTTP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.15.30.2 & 443 & TCP & allow & U1 to PWEB (HTTPS)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.2 & 3128 & TCP & allow & U1 to HTTP proxy\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.4 & 53 & TCP & allow & U1 to LDNS (TCP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.4 & 53 & UDP & allow & U1 to LDNS (UDP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.5 & 25 & TCP & allow & U1 to MAIL (SMTP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.5 & 143 & TCP & allow & U1 to MAIL (IMAP)\\ \hline
+	        \id & 192.168.1.0/24 & * & * & * & * & deny & deny everthing else out of \emph{z-u1}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-mail-top}}\\ \hline
+	        \id & * & * & 172.16.32.5 & 25 & TCP & allow & MAIL from Internet (SMTP)\\ \hline
+	        \id & * & * & 172.16.32.5 & 993 & TCP & allow & MAIL from Internet (IMAPS)\\ \hline
+	        \id & * & * & 172.16.32.0/24 & * & * & deny & deny everything else to \emph{z-mail-top}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-mail-top}}\\ \hline
+	        \id & 172.16.32.2 & * & * & 80 & TCP & allow & HTTP out (HTTP)\\ \hline
+	        \id & 172.16.32.2 & * & * & 443 & TCP & allow & HTTP out (HTTPS)\\ \hline
+	        \id & 172.16.32.4 & * & * & 53 & TCP & allow & DNS out (TCP)\\ \hline
+	        \id & 172.16.32.4 & * & * & 53 & UDP & allow & DNS out (UDP)\\ \hline
+	        \id & 172.16.32.5 & * & * & 25 & TCP & allow & MAIL out (SMTP)\\ \hline
+	        \id & 172.16.32.5 & * & * & 993 & TCP & allow & MAIL out (IMAPS)\\ \hline
+	        \id & 172.16.32.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-mail-top}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-pweb}}\\ \hline
+	        \id & * & * & 172.15.30.2 & 80 & TCP & allow & HTTP in (to allow from Internet)\\ \hline
+	        \id & * & * & 172.15.30.2 & 443 & TCP & allow & HTTPS in (to allow from Internet)\\ \hline
+	        \id & * & * & 172.15.30.3 & 53 & TCP & allow & PDNS from Internet (TCP)\\ \hline
+	        \id & * & * & 172.15.30.3 & 53 & UDP & allow & PDNS from Internet (UDP)\\ \hline
+	        \id & * & * & 172.15.30.0/24 & * & * & deny & deny everything else to \emph{z-pweb}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-pweb}}\\ \hline
+	        \id & 172.15.30.3 & * & * & 53 & TCP & allow & DNS out (TCP)\\ \hline
+	        \id & 172.15.30.3 & * & * & 53 & UDP & allow & DNS out (UDP)\\ \hline
+	        \id & 172.15.30.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-pweb}\\ \hline
 	        \rowcolor{lightgray}
 	        \multicolumn{8}{|c|}{Other}\\ \hline
-	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
-	    \end{tabularx}
-	    \caption{Rules for firewall \emph{FW1}.}
-	    \label{tab:rules.fw1}
-	\end{table}
+	        \id & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	        \caption{Rules for firewall \emph{FW1}.}
+	        \label{tab:rules.fw1}
+	    \end{longtable}
+	\end{footnotesize}
 	
 	\subsection{Firewall 2}
 	
-	\begin{table}[H]
-	    \centering
-	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	\setcounter{idcounter}{0}
+	
+	\begin{footnotesize}
+	    \begin{longtable}{|l|c|c|c|c|c|c|p{3cm}|}
 	        \hline
 	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
-	        \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_subnet\_2}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-lweb}}\\ \hline
+	        \id & 10.10.3.2 & * & 10.10.4.2 & 80 & TCP & allow & LWEB from HTTP\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.4.2 & 80 & TCP & allow & LWEB from U2\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.4.2 & 20 & TCP & allow & FTP from U2\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.4.2 & 21 & TCP & allow & FTP from U2\\ \hline
+	        \id & * & * & 10.10.4.0/24 & * & * & deny & deny everything else to \emph{z-lweb}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_subnet\_2}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-lweb}}\\ \hline
+	        \id & 10.10.4.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-lweb}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_lweb}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-u2}}\\ \hline
+	        \id & * & * & 192.168.2.0/24 & * & * & deny & deny everything else to \emph{z-u2}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_lweb}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-u2}}\\ \hline
+	        \id & 192.168.2.2 & * & 10.10.3.3 & 67 & TCP & allow & DHCP relay to server\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.3.2 & 3128 & TCP & allow & U2 to HTTP proxy\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.3.4 & 53 & TCP & allow & U2 to LDNS (TCP)\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.3.4 & 53 & UDP & allow & U2 to LDNS (UDP)\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.3.5 & 25 & TCP & allow & U2 to MAIL (SMTP)\\ \hline
+	        \id & 192.168.2.0/24 & * & 10.10.3.5 & 143 & TCP & allow & U2 to MAIL (IMAP)\\ \hline
+	        \id & 192.168.2.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-u2}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-mail-bottom}}\\ \hline
+	        \id & * & * & 10.10.3.0/24 & * & * & deny & deny everything else to \emph{z-mail-bottom}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-mail-bottom}}\\ \hline
+	        \id & 10.10.3.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-mail-bottom}\\ \hline
 	        \rowcolor{lightgray}
 	        \multicolumn{8}{|c|}{Other}\\ \hline
-	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
-	    \end{tabularx}
-	    \caption{Rules for firewall \emph{FW2}.}
-	    \label{tab:rules.fw2}
-	\end{table}
+	        \id & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	        \caption{Rules for firewall \emph{FW2}.}
+	        \label{tab:rules.fw2}
+	    \end{longtable}
+    \end{footnotesize}
 	
 	\subsection{Firewall 3}
 	
-	\begin{table}[H]
-	    \centering
-	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	\setcounter{idcounter}{0}
+	
+	\begin{footnotesize}
+	    \begin{longtable}{|l|c|c|c|c|c|c|p{3cm}|}
 	        \hline
 	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
-	        \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_nfs}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-u3}}\\ \hline
+	        \id & 10.10.1.3 & * & 192.168.3.2 & 22 & TCP & allow & SSH to U3\\ \hline
+	        \id & * & * & 192.168.3.0/24 & * & * & deny & deny everything else to \emph{z-u3}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_nfs}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-u3}}\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.1.3 & 22 & TCP & allow & U3 to SSH\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.1.4 & 873 & TCP & allow & U3 to RSYNC\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2046 & TCP & allow & U3 to NFS (TCP) - \emph{status}\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2046 & UDP & allow & U3 to NFS (UDP) - \emph{status}\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2047 & TCP & allow & U3 to NFS (TCP) - \emph{nlockmgr}\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2047 & UDP & allow & U3 to NFS (UDP) - \emph{nlockmgr}\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2048 & TCP & allow & U3 to NFS (TCP) - \emph{mountd}\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2048 & UDP & allow & U3 to NFS (UDP) - \emph{mountd}\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2049 & TCP & allow & U3 to NFS (TCP)\\ \hline
+	        \id & 192.168.3.2 & * & 10.10.2.2 & 2049 & UDP & allow & U3 to NFS (UDP)\\ \hline
+	        \id & 192.168.3.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-u3}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_u3}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-nfs}}\\ \hline
+	        \id & * & * & 10.10.2.0/24 & * & * & deny & deny everything else to \emph{z-nfs}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_u3}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-nfs}}\\ \hline
+	        \id & 10.10.2.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-nfs}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-ssh-bottom}}\\ \hline
+	        \id & * & * & 10.10.1.0/24 & * & * & deny & deny everything else to \emph{z-ssh-bottom}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-ssh-bottom}}\\ \hline
+	        \id & 10.10.1.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-ssh-bottom}\\ \hline
 	        \rowcolor{lightgray}
 	        \multicolumn{8}{|c|}{Other}\\ \hline
-	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
-	    \end{tabularx}
-	    \caption{Rules for firewall \emph{FW3}.}
-	    \label{tab:rules.fw3}
-	\end{table}
+	        \id & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	        \caption{Rules for firewall \emph{FW3}.}
+	        \label{tab:rules.fw3}
+	    \end{longtable}
+    \end{footnotesize}
 	
 	\subsection{Firewall 4}
 	
-	\begin{table}[H]
-	    \centering
-	    \begin{tabularx}{\textwidth}{|l||c|c||c|c||c|c|X|}
+	\setcounter{idcounter}{0}
+	
+	\begin{footnotesize}
+	    \begin{longtable}{|l|c|c|c|c|c|c|p{3cm}|}
 	        \hline
 	        \textbf{\#} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Protocol} & \textbf{Action} & \textbf{Comments}\\ \hline
-	        \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_subnet\_1}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-ssh-top}}\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.31.3 & 22 & TCP & allow & SSH from U1\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.31.4 & 873 & TCP & allow & RSYNC from U1\\ \hline
+	        \id & * & * & 172.16.31.0/24 & * & * & deny & deny everything else to \emph{z-ssh-top}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_subnet\_1}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-ssh-top}}\\ \hline
+	        \id & 172.16.31.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-ssh-top}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Incoming traffic \emph{z\_servers\_2}}\\ \hline
-	        1 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-u1}}\\ \hline
+	        \id & * & * & 192.168.1.0/24 & * & * & deny & deny everything else to \emph{z-u1}\\ \hline
 	        \rowcolor{lightgray}
-	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z\_servers\_2}}\\ \hline
-	        2 & * & * & * & * & * & * & *\\ \hline
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-u1}}\\ \hline
+	        \id & 192.168.1.2 & * & 172.16.32.3 & 67 & TCP & allow & DHCP relay to server\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.15.30.2 & 80 & TCP & allow & U1 to PWEB (HTTP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.15.30.2 & 443 & TCP & allow & U1 to PWEB (HTTPS)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.2 & 3128 & TCP & allow & U1 to HTTP proxy\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.4 & 53 & TCP & allow & U1 to LDNS (TCP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.4 & 53 & UDP & allow & U1 to LDNS (UDP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.5 & 25 & TCP & allow & U1 to MAIL (SMTP)\\ \hline
+	        \id & 192.168.1.0/24 & * & 172.16.32.5 & 143 & TCP & allow & U1 to MAIL (IMAP)\\ \hline
+	        \id & 192.168.1.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-u1}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-mail-top}}\\ \hline
+	        \id & * & * & 172.16.32.0/24 & * & * & deny & deny everything else to \emph{z-mail-top}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-mail-top}}\\ \hline
+	        \id & 172.16.32.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-mail-top}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Incoming traffic \emph{z-pweb}}\\ \hline
+	        \id & * & * & 172.15.30.0/24 & * & * & deny & deny everything else to \emph{z-pweb}\\ \hline
+	        \rowcolor{lightgray}
+	        \multicolumn{8}{|c|}{Outgoing traffic \emph{z-pweb}}\\ \hline
+	        \id & 172.15.30.0/24 & * & * & * & * & deny & deny everything else out of \emph{z-pweb}\\ \hline
 	        \rowcolor{lightgray}
 	        \multicolumn{8}{|c|}{Other}\\ \hline
-	        3 & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
-	    \end{tabularx}
-	    \caption{Rules for firewall \emph{FW4}.}
-	    \label{tab:rules.fw4}
-	\end{table}
+	        \id & * & * & * & * & * & deny, log & Should not happen. Log to be sure.\\ \hline
+	        \caption{Rules for firewall \emph{FW4}.}
+            \label{tab:rules.fw4}
+	    \end{longtable}
+    \end{footnotesize}
 	
-	\section{Explanations}
+	\subsection{NAT (firewall 1)}
 	
-	to do
+	\setcounter{idcounter}{0}
+	\setcounter{portcounter}{3000}
+	
+	\begin{footnotesize}
+	    \begin{longtable}{|c||c|c|c|c||c|c|c|c|}
+	        \hline
+	        \multirow{2}{*}{\#} & \multicolumn{4}{|c||}{Intern} & \multicolumn{4}{c|}{Extern}\\ \cline{2-9}
+	        & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port} & \textbf{Source} & \textbf{Port} & \textbf{Destination} & \textbf{Port}\\ \hline
+	        \id & 172.16.32.2 & * & * & 80 & 172.15.29.130 & \port & * & 80\\ \hline
+	        \id & 172.16.32.2 & * & * & 443 & 172.15.29.130 & \port & * & 443\\ \hline
+	        \id & 172.16.32.3 & * & * & 53 & 172.15.29.130 & \port & * & 53\\ \hline
+	        \id & 172.16.32.5 & * & * & 25 & 172.15.29.130 & \port & * & 25\\ \hline
+	        \id & 172.16.32.5 & * & * & 993 & 172.15.29.130 & \port & * & 993\\ \hline
+	        \id & 172.16.31.3 & * & * & 22 & 172.15.29.130 & \port & * & 22\\ \hline
+	        \caption{Rules for NAT (firewall \emph{FW1}).}
+            \label{tab:rules.nat}
+	    \end{longtable}
+	\end{footnotesize}
+	
+	The first two rules translate the address of the HTTP proxy when it makes requests to the Internet.
+	
+	The third rule translates the address of the local DNS server to allow requests to outside DNS servers, if needed.
+	
+	The fourth and fifth rules translate the address of the MAIL server to allow the sending and receiving of mails outside the company's network.
+	
+	Finally, the last rule translates the SSH relay when it makes SSH requests to the Internet.
 \end{document}
