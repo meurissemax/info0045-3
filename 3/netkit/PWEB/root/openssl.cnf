@@ -1,0 +1,47 @@
+[req]
+default_bits        = 2048
+default_keyfile     = server-key.pem
+distinguished_name  = subject
+req_extensions      = extensions
+x509_extensions     = extensions
+string_mask         = utf8only
+
+[ subject ]
+countryName         = Country Name (2 letter code)
+countryName_default     = US
+
+stateOrProvinceName     = State or Province Name (full name)
+stateOrProvinceName_default = D.C.
+
+localityName            = Locality Name (eg, city)
+localityName_default        = Washington
+
+rganizationName         = Organization Name (eg, company)
+organizationName_default    = Fakenews Inc
+
+organizationalUnitName		= Organizational Unit Name (eg, section)
+organizationalUnitName_default	= Fakenews Inc
+
+commonName          = Common Name (e.g. server FQDN or YOUR name)
+commonName_default      = fakenews.tweet
+
+emailAddress            = Email Address
+emailAddress_default        = 
+
+[ extensions ]
+subjectKeyIdentifier        = hash
+authorityKeyIdentifier  = keyid,issuer
+
+basicConstraints        = CA:FALSE
+keyUsage            = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage    = serverAuth
+subjectAltName          = @alternate_names
+nsComment           = "OpenSSL Generated Certificate"
+
+[ alternate_names ]
+DNS.1       = fakenews.tweet
+DNS.2       = www.fakenews.tweet
+DNS.3       = mail.fakenews.tweet
+DNS.4       = 172.15.30.2
+DNS.5       = 172.15.29.130
+

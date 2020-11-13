@@ -1,0 +1,19 @@
+ip link set eth0 up
+ip address add 10.10.4.2/24 dev eth0
+
+ip route add default via 10.10.4.1
+
+cp /root/httpd.conf /etc/apache2/
+
+/etc/init.d/apache2 start
+
+groupadd ftpusers
+
+useradd joe -g ftpusers -s /bin/false
+useradd donald -g ftpusers -s /bin/false
+
+echo "joe:joe" | chpasswd
+echo "donald:donald" | chpasswd
+
+echo /bin/false >> /etc/shells
+/etc/init.d/proftpd start
