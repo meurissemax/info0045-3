@@ -1,0 +1,27 @@
+useradd joe
+cp -r /etc/skel /home/joe
+chown -R joe:joe /home/joe
+chmod go-w /home/joe
+chmod 700 /home/joe/.ssh
+chmod 700 /home/joe/.ssh/id_rsa
+chmod 700 /home/joe/.ssh/known_hosts
+chmod 700 /home/joe/.ssh/config
+mkdir /home/joe/.mutt
+mkdir /home/joe/.mutt/cache
+
+useradd donald
+cp -r /etc/skel /home/donald
+chown -R donald:donald /home/donald
+chmod go-w /home/donald
+chmod 700 /home/donald/.ssh
+chmod 700 /home/donald/.ssh/id_rsa
+chmod 700 /home/donald/.ssh/known_hosts
+chmod 700 /home/donald/.ssh/config
+mkdir /home/donald/.mutt
+mkdir /home/donald/.mutt/cache
+
+echo "joe:joe" | chpasswd
+echo "donald:donald" | chpasswd
+dpkg -i /root/rsync_3.0.3-2_i386.deb
+ifup eth0
+

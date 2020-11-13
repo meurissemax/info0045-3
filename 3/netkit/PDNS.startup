@@ -1,0 +1,6 @@
+ip link set eth0 up
+ip address add 172.15.30.3/24 dev eth0
+
+ip route add default via 172.15.30.1
+
+/etc/init.d/dnsmasq start

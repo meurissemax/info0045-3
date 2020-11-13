@@ -1,0 +1,19 @@
+useradd joe
+cp -r /etc/skel /home/joe
+chown -R joe:joe /home/joe
+chmod go-w /home/joe
+mkdir /home/joe/.mutt
+mkdir /home/joe/.mutt/cache
+
+useradd donald
+cp -r /etc/skel /home/donald
+chown -R donald:donald /home/donald
+chmod go-w /home/donald
+mkdir /home/donald/.mutt
+mkdir /home/donald/.mutt/cache
+
+echo "joe:joe" | chpasswd
+echo "donald:donald" | chpasswd
+
+ifup eth0
+

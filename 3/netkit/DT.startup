@@ -1,0 +1,21 @@
+ip link set eth0 up
+ip address add 172.15.28.2/24 dev eth0
+
+ip route add default via 172.15.28.1
+
+useradd donald
+cp -r /etc/skel /home/donald
+chown -R donald:donald /home/donald
+chmod go-w /home/donald
+chmod 700 /home/donald/.ssh
+chmod 700 /home/donald/.ssh/id_rsa
+chmod 700 /home/donald/.ssh/known_hosts
+chmod 700 /home/donald/.ssh/config
+chmod 600 /home/donald/.ssh/authorized_keys
+
+mkdir /home/donald/.mutt
+mkdir /home/donald/.mutt/cache
+
+echo "donald:donald" | chpasswd
+/etc/init.d/ssh start
+

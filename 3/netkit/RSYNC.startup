@@ -1,0 +1,36 @@
+ip link set eth0 up
+ip address add 172.16.31.4/24 dev eth0
+
+ip link set eth1 up
+ip address add 10.10.1.4/24 dev eth1
+
+ip route add default via 172.16.31.1
+route add -net 10.10.2.0/24 gw 10.10.1.1
+route add -net 192.168.3.0/24 gw 10.10.1.1
+route add -net 192.168.1.0/24 gw 172.16.31.2
+
+useradd joe
+cp -r /etc/skel /home/joe
+chown -R joe:joe /home/joe
+chmod go-w /home/joe
+chmod 700 /home/joe/.ssh
+chmod 600 /home/joe/.ssh/authorized_keys
+
+
+useradd donald
+cp -r /etc/skel /home/donald
+chown -R donald:donald /home/donald
+chmod go-w /home/donald
+chmod 700 /home/donald/.ssh
+chmod 600 /home/donald/.ssh/authorized_keys
+
+echo "joe:joe" | chpasswd
+echo "donald:donald" | chpasswd
+
+/etc/init.d/ssh start
+
+dpkg -i /root/rsync_3.0.3-2_i386.deb
+cp /root/rsync /etc/default/
+
+chmod 600 /etc/rsyncd.secrets
+/etc/init.d/rsync start
