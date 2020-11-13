@@ -6,3 +6,10 @@
 *.cls linguist-vendored
 *.sty linguist-vendored
 *.bib linguist-vendored
+
+
+##############################
+# Netkit miscellaneous files #
+##############################
+
+*.html linguist-vendored
