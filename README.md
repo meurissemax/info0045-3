@@ -10,3 +10,7 @@ Project realized as part of the *Introduction to computer security* course given
 
 * **Maxime Meurisse** - [meurissemax](https://github.com/meurissemax)
 * **Valentin Vermeylen** - [ValentinVermeylen](https://github.com/ValentinVermeylen)
+
+## Score
+
+* This project received a score of **17.6/20**.
